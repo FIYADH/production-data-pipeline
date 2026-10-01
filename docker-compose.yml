@@ -1,0 +1,31 @@
+services:
+
+  postgres:
+    image: postgres:16
+    container_name: pipeline_postgres
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  airflow:
+    image: apache/airflow:2.10.4
+    container_name: pipeline_airflow
+    restart: always
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+    command: standalone
+
+volumes:
+  postgres_data:
